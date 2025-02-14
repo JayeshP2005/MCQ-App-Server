@@ -100,52 +100,39 @@ import queRoutes from "./routes/queRoutes.js";
 
 const app = express();
 
-// ✅ Logger for debugging
-app.use(logger("dev"));
+// ✅ CORS Configuration (Fixes Vercel Deployment Issue)
+app.use(
+  cors({
+    origin: ["https://mcq-app-ui.vercel.app", "http://localhost:3000"], // ✅ Allow frontend URLs
+    methods: ["GET", "POST", "PUT", "DELETE"], // ✅ Allowed methods
+    allowedHeaders: ["Content-Type", "Authorization"], // ✅ Allowed headers
+    credentials: true, // ✅ Allow cookies & tokens
+  })
+);
+
+// ✅ Handle Preflight Requests (Important for Vercel)
+app.options("*", cors());
 
 // ✅ Middleware
+app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// ✅ CORS Setup (Fix for Vercel Deployment)
-app.use(
-  cors({
-    origin: ["https://mcq-app-ui.vercel.app,http://localhost:3000"], // Replace with your frontend URL
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    allowedHeaders: "Content-Type, Authorization",
-    credentials: true, // Allow cookies & headers
-  })
-);
-
-// ✅ Additional CORS Handling (For Vercel Issues)
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
-
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-  next();
-});
-
-// ✅ Serve Static Files (if needed)
+// ✅ Serve static files (if needed)
 app.use(express.static(path.join(process.cwd(), "public")));
 
-// ✅ API Routes
+// ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/que", queRoutes);
 
-// ✅ 404 Route Not Found
+// ✅ Handle 404 errors
 app.use((req, res, next) => {
   next(createError(404, "API route not found"));
 });
 
-// ✅ Global Error Handler
+// ✅ Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.message);
   res.status(err.status || 500).json({
     success: false,
     message: err.message || "Internal Server Error",
@@ -153,6 +140,7 @@ app.use((err, req, res, next) => {
 });
 
 export default app;
+
 
 
 
