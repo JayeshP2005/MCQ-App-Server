@@ -201,10 +201,10 @@ export const forgotPassword = async (req, res) => {
         const user = await findUserByEmail(email);
         if (!user) return res.status(400).json({ error: "User not found" });
  
-        useEffect(() => {
+        // useEffect(() => {
         const otp = Math.floor(100000 + Math.random() * 900000);
         const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
-        }, []);
+        // }, []);
 
         await saveOTP(email, otp, otpExpires);
         await sendOTPEmail(email, otp);

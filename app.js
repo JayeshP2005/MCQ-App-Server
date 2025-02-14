@@ -47,51 +47,45 @@
 
 // module.exports = app;
 
-
 import express from "express";
-import path from "path";
+import cors from "cors";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import cors from "cors";
+import path from "path";
 import createError from "http-errors";
 
-import indexRouter from "./routes/index.js";
-import usersRouter from "./routes/users.js";
-import stdRouter from "./routes/Students.js";
-import queController from "./pages/api/save.js";
+import authRoutes from "./routes/authRoutes.js";
+import queRoutes from "./routes/queRoutes.js";
 
 const app = express();
-app.use(cors());
 
-// ✅ View Engine Setup
-const __dirname = path.resolve();
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "jade");
-
+// ✅ Middleware
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(cors({ origin: "*" })); // Allow frontend connection
+
+// ✅ Serve static files (if needed)
+app.use(express.static(path.join(process.cwd(), "public")));
 
 // ✅ Routes
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
-app.use("/std", stdRouter);
-app.use("/que", queController);
+app.use("/api/auth", authRoutes);
+app.use("/api/que", queRoutes);
 
-// ✅ Catch 404 and forward to error handler
+// ✅ Handle 404 errors
 app.use((req, res, next) => {
-  next(createError(404));
+  next(createError(404, "API route not found"));
 });
 
-// ✅ Error Handler
+// ✅ Error handling middleware
 app.use((err, req, res, next) => {
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  res.status(err.status || 500);
-  res.render("error");
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
 });
 
 export default app;
+
+
