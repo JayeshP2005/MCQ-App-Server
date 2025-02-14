@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "nodemon ./bin/www"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -23,6 +22,7 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.9",
+    "terser": "^5.39.0",
     "uglify-js": "^3.19.3"
   },
   "type": "module"
