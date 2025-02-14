@@ -111,7 +111,7 @@ app.use(cookieParser());
 // ✅ CORS Setup (Fix for Vercel Deployment)
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://mcq-app-client.vercel.app"], // Replace with your frontend URL
+    origin: ["https://mcq-app-ui.vercel.app,http://localhost:3000"], // Replace with your frontend URL
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type, Authorization",
     credentials: true, // Allow cookies & headers
